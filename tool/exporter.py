@@ -74,7 +74,7 @@ def parse_config():
                         help='specify the config for demo')
     parser.add_argument('--data_path', type=str, default='demo_data',
                         help='specify the point cloud data file or directory')
-    parser.add_argument('--ckpt', type=str, default='/home/ailab/Project/04_HMG_AVC/OpenPCDet/output/argo2_models/voxel04_pointpillar_v2/default/ckpt/checkpoint_epoch_73.pth',
+    parser.add_argument('--ckpt', type=str, default='/home/ailab/AILabDataset/03_Shared_Repository/jinsu/03_HMG_AVC/OpenPCDet/Real/argo2_models/voxel04_pointpillar_v2/default/ckpt/checkpoint_epoch_57.pth',
                         help='specify the pretrained model')
     parser.add_argument('--ext', type=str, default='.bin', help='specify the extension of your point cloud data file')
 
