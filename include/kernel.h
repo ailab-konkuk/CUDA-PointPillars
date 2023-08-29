@@ -25,12 +25,12 @@
 #include "params.h"
 
 const int THREADS_FOR_VOXEL = 256;    // threads number for a block
-const int POINTS_PER_VOXEL = 5;      // depands on "params.h"
+const int POINTS_PER_VOXEL = 5;       // depands on "params.h" (Params::max_num_points_per_pillar)
 const int WARP_SIZE = 32;             // one warp(32 threads) for one pillar
 const int WARPS_PER_BLOCK = 4;        // four warp for one block
 const int FEATURES_SIZE = 10;         // features maps number depands on "params.h"
 const int PILLARS_PER_BLOCK = 64;     // one thread deals with one pillar and a block has PILLARS_PER_BLOCK threads
-const int PILLAR_FEATURE_SIZE = 64;   // feature count for one pillar depands on "params.h"
+const int PILLAR_FEATURE_SIZE = 64;   // feature count for one pillar depands on "params.h" (Params::num_feature_scatter)
 
 typedef enum
 {

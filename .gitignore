@@ -4,6 +4,7 @@ __pycache__/
 
 # *.onnx file
 *.onnx
+*.cache
 
 # Inference data
 *.bin
