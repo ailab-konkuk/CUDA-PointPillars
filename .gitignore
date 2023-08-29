@@ -6,6 +6,9 @@ __pycache__/
 *.onnx
 *.cache
 
+# Pytorch *.pth file
+*.pth
+
 # Inference data
 *.bin
 *.txt
