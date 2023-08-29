@@ -4,3 +4,10 @@ __pycache__/
 
 # *.onnx file
 *.onnx
+
+# Inference data
+*.bin
+*.txt
+
+# Build file
+build/

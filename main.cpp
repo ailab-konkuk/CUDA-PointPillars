@@ -37,9 +37,9 @@
     }                                                             \
 }
 
-std::string Data_File = "../data/";
-std::string Save_Dir = "../eval/kitti/object/pred_velo/";
-std::string Model_File = "../model/pointpillar.onnx";
+std::string Data_File = "../custom_data/";
+std::string Save_Dir = "../custom_data/box_prediction/";
+std::string Model_File = "../model/pointpillar_custom.onnx";
 
 void Getinfo(void)
 {
@@ -142,7 +142,7 @@ int main(int argc, const char **argv)
 
   PointPillar pointpillar(Model_File, stream);
 
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < 60; i++)
   {
     std::string dataFile = Data_File;
 

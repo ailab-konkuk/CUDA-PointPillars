@@ -145,6 +145,8 @@ __global__ void generateBaseFeatures_kernel(unsigned int *mask, float *voxels,
 
   unsigned int current_pillarId = 0;
   current_pillarId = atomicAdd(pillar_num, 1);
+  
+  // if( current_pillarId >= MAX_VOXELS ) return;
 
   voxel_num[current_pillarId] = count;
 
@@ -194,9 +196,11 @@ __global__ void generateFeatures_kernel(float* voxel_features,
     int pillar_idx = blockIdx.x * WARPS_PER_BLOCK + threadIdx.x/WARP_SIZE;
     int point_idx = threadIdx.x % WARP_SIZE;
 
+    // int pillar_idx_inBlock = threadIdx.x/WARP_SIZE;
     int pillar_idx_inBlock = threadIdx.x/32;
     unsigned int num_pillars = params[0];
 
+    // if (pillar_idx >= num_pillars || pillar_idx >= MAX_VOXELS) return;
     if (pillar_idx >= num_pillars) return;
 
     __shared__ float4 pillarSM[WARPS_PER_BLOCK][WARP_SIZE];
