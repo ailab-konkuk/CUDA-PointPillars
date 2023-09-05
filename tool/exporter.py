@@ -70,11 +70,12 @@ class DemoDataset(DatasetTemplate):
 
 def parse_config():
     parser = argparse.ArgumentParser(description='arg parser')
-    parser.add_argument('--cfg_file', type=str, default='cfgs/kitti_models/pointpillar.yaml',
+    parser.add_argument('--cfg_file', type=str, default='cfgs/argo2_models/voxel04_pointpillar_v3.yaml',
                         help='specify the config for demo')
     parser.add_argument('--data_path', type=str, default='demo_data',
                         help='specify the point cloud data file or directory')
-    parser.add_argument('--ckpt', type=str, default='./pointpillar_7728.pth',
+    parser.add_argument('--ckpt', type=str, default='/home/ailab/AILabDataset/03_Shared_Repository/jinsu/03_HMG_AVC/OpenPCDet/Real/argo2_models/voxel04_pointpillar_v3/default/ckpt/checkpoint_epoch_200.pth',
+
                         help='specify the pretrained model')
     parser.add_argument('--ext', type=str, default='.bin', help='specify the extension of your point cloud data file')
 
@@ -102,9 +103,30 @@ def main():
     with torch.no_grad():
 
       MAX_VOXELS = 10000
+      NUMBER_OF_CLASSES = len(cfg.CLASS_NAMES)
+      MAX_POINTS_PER_VOXEL = None
+
+      DATA_PROCESSOR = cfg.DATA_CONFIG.DATA_PROCESSOR
+      POINT_CLOUD_RANGE = cfg.DATA_CONFIG.POINT_CLOUD_RANGE
+      for i in DATA_PROCESSOR:
+          if i['NAME'] == "transform_points_to_voxels":
+              MAX_POINTS_PER_VOXEL = i['MAX_POINTS_PER_VOXEL']
+              VOXEL_SIZES = i['VOXEL_SIZE']
+              break
+
+      if MAX_POINTS_PER_VOXEL == None:
+          logger.info('Could Not Parse Config... Exiting')
+          import sys
+          sys.exit()
+
+      VOXEL_SIZE_X = abs(POINT_CLOUD_RANGE[0] - POINT_CLOUD_RANGE[3]) / VOXEL_SIZES[0]
+      VOXEL_SIZE_Y = abs(POINT_CLOUD_RANGE[1] - POINT_CLOUD_RANGE[4]) / VOXEL_SIZES[1]
+
+      FEATURE_SIZE_X = VOXEL_SIZE_X / 2  # Is this number of bins?
+      FEATURE_SIZE_Y = VOXEL_SIZE_Y / 2
 
       dummy_voxels = torch.zeros(
-          (MAX_VOXELS, 32, 4),
+          (MAX_VOXELS, MAX_POINTS_PER_VOXEL, 4),
           dtype=torch.float32,
           device='cuda:0')
 
@@ -122,11 +144,11 @@ def main():
       dummy_input['voxels'] = dummy_voxels
       dummy_input['voxel_num_points'] = dummy_voxel_num
       dummy_input['voxel_coords'] = dummy_voxel_idxs
-      dummy_input['batch_size'] = 1
+      dummy_input['batch_size'] = torch.tensor(1)
 
       torch.onnx.export(model,       # model being run
           dummy_input,               # model input (or a tuple for multiple inputs)
-          "./pointpillar_raw.onnx",  # where to save the model (can be a file or file-like object)
+          "./pp_argo2_v3_raw.onnx",  # where to save the model (can be a file or file-like object)
           export_params=True,        # store the trained parameter weights inside the model file
           opset_version=11,          # the ONNX version to export the model to
           do_constant_folding=True,  # whether to execute constant folding for optimization
@@ -135,14 +157,14 @@ def main():
           output_names = ['cls_preds', 'box_preds', 'dir_cls_preds'], # the model's output names
           )
 
-      onnx_raw = onnx.load("./pointpillar_raw.onnx")  # load onnx model
-      onnx_trim_post = simplify_postprocess(onnx_raw)
+      onnx_raw = onnx.load("./pp_argo2_v3_raw.onnx")  # load onnx model
+      onnx_trim_post = simplify_postprocess(onnx_raw, FEATURE_SIZE_X, FEATURE_SIZE_Y, NUMBER_OF_CLASSES)
       
       onnx_simp, check = simplify(onnx_trim_post)
       assert check, "Simplified ONNX model could not be validated"
 
-      onnx_final = simplify_preprocess(onnx_simp)
-      onnx.save(onnx_final, "pointpillar.onnx")
+      onnx_final = simplify_preprocess(onnx_simp, VOXEL_SIZE_X, VOXEL_SIZE_Y, MAX_POINTS_PER_VOXEL)
+      onnx.save(onnx_final, "pp_argo2_v3.onnx")
       print('finished exporting onnx')
 
     logger.info('[PASS] ONNX EXPORTED.')

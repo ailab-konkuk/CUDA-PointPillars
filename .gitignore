@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# *.onnx file
+*.onnx
+*.cache
+
+# Pytorch *.pth file
+*.pth
+
+# Inference data
+*.bin
+*.txt
+
+# Build file
+build/
+
+# VSCode config file
+.vscode/

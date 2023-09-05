@@ -16,7 +16,7 @@
  */
 #ifndef PARAMS_H_
 #define PARAMS_H_
-const int MAX_VOXELS = 20000;
+const int MAX_VOXELS = 40000;
 class Params
 {
   public:
@@ -33,7 +33,7 @@ class Params
     const float pillar_y_size = 0.4;
     const float pillar_z_size = 20.0;
     const int max_num_points_per_pillar = 32;
-    const int num_point_values = 4;
+    const int num_point_values = 0;
     // the number of feature maps for pillar scatter
     const int num_feature_scatter = 64;
     const float dir_offset = 0.78539;
