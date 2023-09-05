@@ -37,9 +37,9 @@
     }                                                             \
 }
 
-std::string Data_File = "../custom_data/";
-std::string Save_Dir = "../custom_data/box_prediction/";
-std::string Model_File = "../model/pointpillar_custom.onnx";
+std::string Data_File = "../custom_data_1/";
+std::string Save_Dir = "../custom_data_1/pp_argo2_v3/";
+std::string Model_File = "../model/pp_argo2_v3.onnx";
 
 void Getinfo(void)
 {
