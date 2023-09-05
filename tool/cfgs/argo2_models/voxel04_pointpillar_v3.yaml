@@ -15,10 +15,10 @@ DATA_CONFIG:
 
         - NAME: transform_points_to_voxels
           VOXEL_SIZE: [0.4, 0.4, 20.0]
-          MAX_POINTS_PER_VOXEL: 5
+          MAX_POINTS_PER_VOXEL: 32
           MAX_NUMBER_OF_VOXELS: {
-            'train': 160000,
-            'test': 400000
+            'train': 16000,
+            'test': 40000
           }
     DATA_AUGMENTOR:
         DISABLE_AUG_LIST: ['placeholder']
