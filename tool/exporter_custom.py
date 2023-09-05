@@ -70,11 +70,11 @@ class DemoDataset(DatasetTemplate):
 
 def parse_config():
     parser = argparse.ArgumentParser(description='arg parser')
-    parser.add_argument('--cfg_file', type=str, default='cfgs/argo2_models/voxel04_pointpillar_v2.yaml',
+    parser.add_argument('--cfg_file', type=str, default='cfgs/argo2_models/voxel04_pointpillar_v3.yaml',
                         help='specify the config for demo')
     parser.add_argument('--data_path', type=str, default='demo_data',
                         help='specify the point cloud data file or directory')
-    parser.add_argument('--ckpt', type=str, default='/home/ailab/AILabDataset/03_Shared_Repository/jinsu/03_HMG_AVC/OpenPCDet/Real/argo2_models/voxel04_pointpillar_v2/default/ckpt/checkpoint_epoch_144.pth',
+    parser.add_argument('--ckpt', type=str, default='/home/ailab/AILabDataset/03_Shared_Repository/jinsu/03_HMG_AVC/OpenPCDet/Real/argo2_models/voxel04_pointpillar_v3/default/ckpt/checkpoint_epoch_200.pth',
                         help='specify the pretrained model')
     parser.add_argument('--ext', type=str, default='.bin', help='specify the extension of your point cloud data file')
 
@@ -147,7 +147,7 @@ def main():
 
       torch.onnx.export(model,       # model being run
           dummy_input,               # model input (or a tuple for multiple inputs)
-          "./pointpillar_custom_raw.onnx",  # where to save the model (can be a file or file-like object)
+          "./pointpillar_argo2_v3_custom_2080s_raw_6.onnx",  # where to save the model (can be a file or file-like object)
           export_params=True,        # store the trained parameter weights inside the model file
           opset_version=11,          # the ONNX version to export the model to
           do_constant_folding=True,  # whether to execute constant folding for optimization
@@ -156,14 +156,14 @@ def main():
           output_names = ['cls_preds', 'box_preds', 'dir_cls_preds'], # the model's output names
           )
 
-      onnx_raw = onnx.load("./pointpillar_custom_raw.onnx")  # load onnx model
+      onnx_raw = onnx.load("./pointpillar_argo2_v3_custom_2080s_raw_6.onnx")  # load onnx model
       onnx_trim_post = simplify_postprocess(onnx_raw, FEATURE_SIZE_X, FEATURE_SIZE_Y, NUMBER_OF_CLASSES)
       
       onnx_simp, check = simplify(onnx_trim_post)
       assert check, "Simplified ONNX model could not be validated"
 
       onnx_final = simplify_preprocess(onnx_simp, VOXEL_SIZE_X, VOXEL_SIZE_Y, MAX_POINTS_PER_VOXEL)
-      onnx.save(onnx_final, "pointpillar_custom.onnx")
+      onnx.save(onnx_final, "pointpillar_argo2_v3_custom_2080s_6.onnx")
       print('finished exporting onnx')
 
     logger.info('[PASS] ONNX EXPORTED.')
