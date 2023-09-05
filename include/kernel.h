@@ -25,7 +25,7 @@
 #include "params.h"
 
 const int THREADS_FOR_VOXEL = 256;    // threads number for a block
-const int POINTS_PER_VOXEL = 5;       // depands on "params.h" (Params::max_num_points_per_pillar)
+const int POINTS_PER_VOXEL = 32;       // depands on "params.h" (Params::max_num_points_per_pillar)
 const int WARP_SIZE = 32;             // one warp(32 threads) for one pillar
 const int WARPS_PER_BLOCK = 4;        // four warp for one block
 const int FEATURES_SIZE = 10;         // features maps number depands on "params.h"
