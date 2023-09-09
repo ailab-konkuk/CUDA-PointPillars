@@ -92,10 +92,18 @@ def parse_config():
         print('------ Using Auto Mode ------')
         args.cfg_file = str(ROOT_DIR / args.version / "default" / args.version) + ".yaml"
         args.ckpt = ROOT_DIR / args.version / "default" / "ckpt" / "latest_model.pth"
-        args.savedir = ROOT_DIR / args.version / "default" / "onnx"
-        args.save = ROOT_DIR / args.version / "default" / "onnx" / args.version
+        
+        # a) folder by folder
+        # args.savedir = ROOT_DIR / args.version / "default" / "onnx"
+        # args.save = ROOT_DIR / args.version / "default" / "onnx" / args.version
+        # Example: ROOT_DIR/voxel04_pointpillar_v2/default/onnx/voxel04_pointpillar_v2.onnx
+        
+        # b) integrated folder
+        args.savedir = ROOT_DIR / "onnx"
+        args.save = ROOT_DIR / "onnx" / args.version
+        # Example: ROOT_DIR/onnx/voxel04_pointpillar_v2.onnx
+
         os.makedirs(args.savedir, exist_ok=True)
-    
     # Choice 2
     else:
         print('------ Using Manual Mode ------')
