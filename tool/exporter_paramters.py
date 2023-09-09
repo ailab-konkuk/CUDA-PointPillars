@@ -18,7 +18,7 @@ License = '''/*
  * limitations under the License.
  */'''
 
-def export_paramters(cfg):
+def export_paramters(cfg, args=None):
   CLASS_NAMES = []
   CLASS_NUM = 0
   rangMinX = 0
@@ -59,7 +59,10 @@ def export_paramters(cfg):
   for item in cfg.DATA_CONFIG.DATA_AUGMENTOR.AUG_CONFIG_LIST :
     if (item.NAME == "gt_sampling") :
       NUM_POINT_FEATURES = item.NUM_POINT_FEATURES
-
+    else:
+      print("\033[33m No NUM_POINT_FEATURES found, \033[0m")
+      print("\033[33m Using Default \"NUM_POINT_FEATURES\" value \033[0m")
+      NUM_POINT_FEATURES = 4 # x,y,z,i
   NUM_BEV_FEATURES = cfg.MODEL.MAP_TO_BEV.NUM_BEV_FEATURES
   DIR_OFFSET = cfg.MODEL.DENSE_HEAD.DIR_OFFSET
   DIR_LIMIT_OFFSET = cfg.MODEL.DENSE_HEAD.DIR_LIMIT_OFFSET
@@ -79,7 +82,7 @@ def export_paramters(cfg):
   NMS_THRESH = cfg.MODEL.POST_PROCESSING.NMS_CONFIG.NMS_THRESH
 
   # dump paramters to params.h
-  fo = open("params.h","w")
+  fo = open(str(args.save)+ "_params.h", mode='x')
   fo.write(License+"\n")
   fo.write("#ifndef PARAMS_H_\n#define PARAMS_H_\n")
   fo.write("const int MAX_VOXELS = "+str(MAX_NUMBER_OF_VOXELS)+";\n")
