@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import glob
+import os, glob
 import onnx
 import torch
 import argparse
@@ -70,24 +70,46 @@ class DemoDataset(DatasetTemplate):
 
 def parse_config():
     parser = argparse.ArgumentParser(description='arg parser')
-    parser.add_argument('--cfg_file', type=str, default='cfgs/argo2_models/voxel04_pointpillar_v3.yaml',
-                        help='specify the config for demo')
     parser.add_argument('--data_path', type=str, default='demo_data',
                         help='specify the point cloud data file or directory')
+    
+    # Choice 1: 자동으로 해당 학습 결과에서 학습 결과와 configuration 불러와서 onnx/ 경로에 저장
+    parser.add_argument('--version', type=str, default=None, help='Automatically load config and weights using training version')
+    
+    # Choice 2: 기존 방법, 각 파일에 대한 경로 직접 정의
+    parser.add_argument('--cfg_file', type=str, default='cfgs/argo2_models/voxel04_pointpillar_v3.yaml',
+                        help='specify the config for demo')
     parser.add_argument('--ckpt', type=str, default='/home/ailab/AILabDataset/03_Shared_Repository/jinsu/03_HMG_AVC/OpenPCDet/Real/argo2_models/voxel04_pointpillar_v3/default/ckpt/checkpoint_epoch_200.pth',
-
                         help='specify the pretrained model')
     parser.add_argument('--ext', type=str, default='.bin', help='specify the extension of your point cloud data file')
 
-    args = parser.parse_args()
 
+    args = parser.parse_args()
+    ROOT_DIR = Path("/home/ailab/AILabDataset/03_Shared_Repository/jinsu/03_HMG_AVC/OpenPCDet/Real/argo2_models/")
+    
+    # Choice 1
+    if args.version is not None:
+        print('------ Using Auto Mode ------')
+        args.cfg_file = str(ROOT_DIR / args.version / "default" / args.version) + ".yaml"
+        args.ckpt = ROOT_DIR / args.version / "default" / "ckpt" / "latest_model.pth"
+        args.savedir = ROOT_DIR / args.version / "default" / "onnx"
+        args.save = ROOT_DIR / args.version / "default" / "onnx" / args.version
+        os.makedirs(args.savedir, exist_ok=True)
+    
+    # Choice 2
+    else:
+        print('------ Using Manual Mode ------')
+        # 현재 디렉토리에 cfg_file 명과 동일하게 저장
+        args.save = Path("onnx") / args.cfg_file.split('/')[-1].split('.')[0]
+        os.makedirs("onnx", exist_ok=True) # 출력 결과를 저장할 폴더 생성
+    
     cfg_from_yaml_file(args.cfg_file, cfg)
 
     return args, cfg
 
 def main():
     args, cfg = parse_config()
-    export_paramters(cfg)
+    export_paramters(cfg, args)
     logger = common_utils.create_logger()
     logger.info('------ Convert OpenPCDet model for TensorRT ------')
     demo_dataset = DemoDataset(
@@ -148,7 +170,7 @@ def main():
 
       torch.onnx.export(model,       # model being run
           dummy_input,               # model input (or a tuple for multiple inputs)
-          "./pp_argo2_v3_raw.onnx",  # where to save the model (can be a file or file-like object)
+          str(args.save)+"_raw.onnx",     # where to save the model (can be a file or file-like object)
           export_params=True,        # store the trained parameter weights inside the model file
           opset_version=11,          # the ONNX version to export the model to
           do_constant_folding=True,  # whether to execute constant folding for optimization
@@ -157,17 +179,17 @@ def main():
           output_names = ['cls_preds', 'box_preds', 'dir_cls_preds'], # the model's output names
           )
 
-      onnx_raw = onnx.load("./pp_argo2_v3_raw.onnx")  # load onnx model
+      onnx_raw = onnx.load(str(args.save)+"_raw.onnx")  # load onnx model
       onnx_trim_post = simplify_postprocess(onnx_raw, FEATURE_SIZE_X, FEATURE_SIZE_Y, NUMBER_OF_CLASSES)
       
       onnx_simp, check = simplify(onnx_trim_post)
       assert check, "Simplified ONNX model could not be validated"
 
       onnx_final = simplify_preprocess(onnx_simp, VOXEL_SIZE_X, VOXEL_SIZE_Y, MAX_POINTS_PER_VOXEL)
-      onnx.save(onnx_final, "pp_argo2_v3.onnx")
+      onnx.save(onnx_final, str(args.save)+".onnx")
       print('finished exporting onnx')
 
-    logger.info('[PASS] ONNX EXPORTED.')
+    logger.info('[PASS] ONNX EXPORTED: {}'.format(str(args.save)))
 
 if __name__ == '__main__':
     main()
