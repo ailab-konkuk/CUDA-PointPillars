@@ -75,6 +75,7 @@ def parse_config():
     
     # Choice 1: 자동으로 해당 학습 결과에서 학습 결과와 configuration 불러와서 onnx/ 경로에 저장
     parser.add_argument('--version', type=str, default=None, help='Automatically load config and weights using training version')
+    parser.add_argument('--epoch', type=str, default="latest_model", help='Epoch number')
     
     # Choice 2: 기존 방법, 각 파일에 대한 경로 직접 정의
     parser.add_argument('--cfg_file', type=str, default='cfgs/argo2_models/voxel04_pointpillar_v3.yaml',
@@ -91,8 +92,11 @@ def parse_config():
     if args.version is not None:
         print('------ Using Auto Mode ------')
         args.cfg_file = str(ROOT_DIR / args.version / "default" / args.version) + ".yaml"
-        args.ckpt = ROOT_DIR / args.version / "default" / "ckpt" / "latest_model.pth"
-        
+        if args.epoch == "latest_model":
+            args.ckpt = str(ROOT_DIR / args.version / "default" / "ckpt" / "latest_model")+ ".pth"
+        else:
+            args.ckpt = str(ROOT_DIR / args.version / "default" / "ckpt" / "checkpoint_epoch_") + args.epoch + ".pth"
+
         # a) folder by folder
         # args.savedir = ROOT_DIR / args.version / "default" / "onnx"
         # args.save = ROOT_DIR / args.version / "default" / "onnx" / args.version
@@ -100,7 +104,7 @@ def parse_config():
         
         # b) integrated folder
         args.savedir = ROOT_DIR / "onnx"
-        args.save = ROOT_DIR / "onnx" / args.version
+        args.save = str(ROOT_DIR / "onnx" / args.version) + "_" + args.epoch
         # Example: ROOT_DIR/onnx/voxel04_pointpillar_v2.onnx
 
         os.makedirs(args.savedir, exist_ok=True)
