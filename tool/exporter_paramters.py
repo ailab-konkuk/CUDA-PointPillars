@@ -29,7 +29,7 @@ def export_paramters(cfg, args=None):
   rangMaxZ = 0
   VOXEL_SIZE = []
   MAX_POINTS_PER_VOXEL = 0
-  MAX_NUMBER_OF_VOXELS = 0
+  MAX_NUMBER_OF_VOXELS = args.max_voxels
   NUM_POINT_FEATURES = 0
   NUM_BEV_FEATURES = 0
   DIR_OFFSET = 0
@@ -54,7 +54,8 @@ def export_paramters(cfg, args=None):
     if (item.NAME == "transform_points_to_voxels") :
       VOXEL_SIZE = item.VOXEL_SIZE
       MAX_POINTS_PER_VOXEL = item.MAX_POINTS_PER_VOXEL
-      MAX_NUMBER_OF_VOXELS = item.MAX_NUMBER_OF_VOXELS.test
+      # MAX_NUMBER_OF_VOXELS = item.MAX_NUMBER_OF_VOXELS.test
+      # TODO: yaml 상의 test시의 voxel_num을 실제 max_voxel_num으로 설정하도록 변경
 
   for item in cfg.DATA_CONFIG.DATA_AUGMENTOR.AUG_CONFIG_LIST :
     if (item.NAME == "gt_sampling") :

@@ -72,6 +72,8 @@ def parse_config():
     parser = argparse.ArgumentParser(description='arg parser')
     parser.add_argument('--data_path', type=str, default='demo_data',
                         help='specify the point cloud data file or directory')
+    parser.add_argument('--max_voxels', type=int, default=25000,
+                        help='Max number of voxels (voxel02: 25000, voxel03: 15000,  voxel04: 12500)')
     
     # Choice 1: 자동으로 해당 학습 결과에서 학습 결과와 configuration 불러와서 onnx/ 경로에 저장
     parser.add_argument('--version', type=str, default=None, help='Automatically load config and weights using training version')
@@ -136,7 +138,8 @@ def main():
     np.set_printoptions(threshold=np.inf)
     with torch.no_grad():
 
-      MAX_VOXELS = 40000
+      MAX_VOXELS = args.max_voxels
+
       NUMBER_OF_CLASSES = len(cfg.CLASS_NAMES)
       MAX_POINTS_PER_VOXEL = None
 
@@ -156,7 +159,7 @@ def main():
       VOXEL_SIZE_X = abs(POINT_CLOUD_RANGE[0] - POINT_CLOUD_RANGE[3]) / VOXEL_SIZES[0]
       VOXEL_SIZE_Y = abs(POINT_CLOUD_RANGE[1] - POINT_CLOUD_RANGE[4]) / VOXEL_SIZES[1]
 
-      assert MAX_VOXELS > VOXEL_SIZE_X * VOXEL_SIZE_Y, "MAX_VOXELS is smaller than VOXEL_NUM! Update MAX_VOXELS"
+    #   assert MAX_VOXELS > VOXEL_SIZE_X * VOXEL_SIZE_Y, "MAX_VOXELS is smaller than VOXEL_NUM! Update MAX_VOXELS"
 
       FEATURE_SIZE_X = VOXEL_SIZE_X / 2  # Is this number of bins?
       FEATURE_SIZE_Y = VOXEL_SIZE_Y / 2
