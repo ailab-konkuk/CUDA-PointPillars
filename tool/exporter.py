@@ -136,7 +136,7 @@ def main():
     np.set_printoptions(threshold=np.inf)
     with torch.no_grad():
 
-      MAX_VOXELS = 10000
+      MAX_VOXELS = 40000
       NUMBER_OF_CLASSES = len(cfg.CLASS_NAMES)
       MAX_POINTS_PER_VOXEL = None
 
