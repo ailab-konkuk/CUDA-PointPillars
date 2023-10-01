@@ -156,6 +156,8 @@ def main():
       VOXEL_SIZE_X = abs(POINT_CLOUD_RANGE[0] - POINT_CLOUD_RANGE[3]) / VOXEL_SIZES[0]
       VOXEL_SIZE_Y = abs(POINT_CLOUD_RANGE[1] - POINT_CLOUD_RANGE[4]) / VOXEL_SIZES[1]
 
+      assert MAX_VOXELS > VOXEL_SIZE_X * VOXEL_SIZE_Y, "MAX_VOXELS is smaller than VOXEL_NUM! Update MAX_VOXELS"
+
       FEATURE_SIZE_X = VOXEL_SIZE_X / 2  # Is this number of bins?
       FEATURE_SIZE_Y = VOXEL_SIZE_Y / 2
 
